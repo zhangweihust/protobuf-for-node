@@ -1,7 +1,16 @@
 var assert = require('assert'),
-    puts = require('sys').puts,
+    puts = require('util').puts,
     read = require('fs').readFileSync,
     Schema = require('protobuf_for_node').Schema;
+
+/* hack to make the tests pass with node v0.3.0's new Buffer model */
+/* copied from http://github.com/bnoordhuis/node-iconv/blob/master/test.js */
+assert.bufferEqual = function(a, b, c) {
+	assert.equal(
+		a.inspect().replace(/^<SlowBuffer/, '<Buffer'),
+		b.inspect().replace(/^<SlowBuffer/, '<Buffer'),
+                c);
+};
 
 var T = new Schema(read('test/unittest.desc'))['protobuf_unittest.TestAllTypes'];
 assert.ok(T, 'type in schema');
@@ -9,10 +18,10 @@ var golden = read('test/golden_message');
 var message = T.parse(golden);
 assert.ok(message, 'parses message');  // currently rather crashes 
 
-assert.equal(T.serialize(message).inspect(), golden.inspect(), 'roundtrip');
+assert.bufferEqual(T.serialize(message), golden, 'roundtrip');
 
 message.ignored = 42;
-assert.equal(T.serialize(message).inspect(), golden.inspect(), 'ignored field');
+assert.bufferEqual(T.serialize(message), golden, 'ignored field');
 
 assert.throws(function() {
   T.parse(new Buffer('invalid'));

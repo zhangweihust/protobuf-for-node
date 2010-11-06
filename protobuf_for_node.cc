@@ -54,6 +54,7 @@ using v8::AccessorInfo;
 using v8::Arguments;
 using v8::Boolean;
 using v8::Context;
+using v8::Exception;
 using v8::External;
 using v8::Function;
 using v8::FunctionTemplate;
@@ -69,6 +70,7 @@ using v8::ObjectTemplate;
 using v8::Persistent;
 using v8::Script;
 using v8::String;
+using v8::ThrowException;
 using v8::Value;
 using v8::V8;
 
@@ -251,11 +253,15 @@ namespace protobuf_for_node {
 
       static Handle<Value> Parse(const Arguments& args) {
         Type* type = UnwrapThis<Type>(args);
-        Buffer* buf = ObjectWrap::Unwrap<Buffer>(args[0]->ToObject());
+        if (!Buffer::HasInstance(args[0])) {
+          return ThrowException(Exception::TypeError(
+             String::New("Argument should be a buffer")));
+        }
+        Local<Object> buffer_obj = args[0]->ToObject();
 
         Message* message = type->NewMessage();
         bool success = 
-          message->ParseFromArray(buf->data(), buf->length());
+          message->ParseFromArray(Buffer::Data(buffer_obj), Buffer::Length(buffer_obj));
         Handle<Value> result = success
           ? Handle<Value>(type->ToJs(*message))
                 : v8::ThrowException(
@@ -375,7 +381,7 @@ namespace protobuf_for_node {
         if (!error) {
           result = Buffer::New(message->ByteSize());
           message->SerializeWithCachedSizesToArray(
-              (google::protobuf::uint8*)result->data());
+              (google::protobuf::uint8*)Buffer::Data(result->handle_));
         }
         delete message;
 
@@ -427,10 +433,16 @@ namespace protobuf_for_node {
                            DescriptorPool::generated_pool()))->handle_;
       }
 
-      Buffer* buf = ObjectWrap::Unwrap<Buffer>(args[0]->ToObject());
+      if (!Buffer::HasInstance(args[0])) {
+        return ThrowException(Exception::TypeError(
+           String::New("Argument should be a buffer")));
+      }
+      Local<Object> buffer_obj = args[0]->ToObject();
+      char *buffer_data = Buffer::Data(buffer_obj);
+      size_t buffer_length = Buffer::Length(buffer_obj);
 
       FileDescriptorSet descriptors;
-      if (!descriptors.ParseFromArray(buf->data(), buf->length())) {
+      if (!descriptors.ParseFromArray(buffer_data, buffer_length)) {
         return v8::ThrowException(
             v8::Exception::Error(String::New("Malformed descriptor")));
       }

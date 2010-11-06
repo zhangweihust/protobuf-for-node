@@ -12,7 +12,7 @@
 // implied. See the License for the specific language governing
 // permissions and limitations under the License.
 
-var puts = require('sys').puts;
+var puts = require('util').puts;
 var pwd = require('protoservice');
 
 // Synchronous service call. This is only possible if the service

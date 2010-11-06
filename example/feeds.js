@@ -13,7 +13,7 @@
 // permissions and limitations under the License.
 
 var fs = require('fs');
-var puts = require('sys').puts;
+var puts = require('util').puts;
 
 // The "Schema" constructor lets you load a protocol schema definition
 // (a compiled .proto file).
