@@ -192,7 +192,12 @@ namespace protobuf_for_node {
           return message_type->ToJs(GET(Message));
         case FieldDescriptor::CPPTYPE_STRING: {
           const string& value = GET(String);
-          return String::New(value.data(), value.length());
+          if (field->type() == FieldDescriptor::TYPE_BYTES) {
+            return Buffer::New(const_cast<char *>(value.data()),
+                               value.length())->handle_;
+          } else {
+            return String::New(value.data(), value.length());
+          }
         }
         case FieldDescriptor::CPPTYPE_INT32:
           return Integer::New(GET(Int32));
@@ -294,8 +299,13 @@ namespace protobuf_for_node {
                         value.As<Object>());
           break;
         case FieldDescriptor::CPPTYPE_STRING: {
-          String::AsciiValue ascii(value);
-          SET(String, string(*ascii, ascii.length()));
+          if (field->type() == FieldDescriptor::TYPE_BYTES &&
+              Buffer::HasInstance(value)) {
+            Local<Object> buf = value->ToObject();
+            SET(String, string(Buffer::Data(buf), Buffer::Length(buf)));
+          } else {
+            SET(String, *String::Utf8Value(value));
+          }
           break;
         }
         case FieldDescriptor::CPPTYPE_INT32:
