@@ -75,5 +75,22 @@ assert.throws(function() {
   });
 }, Error, 'Not an array');
 
+assert.bufferEqual(T.parse(
+  T.serialize({
+   optionalBytes: new Buffer('foo')
+  })
+).optionalBytes, new Buffer('foo'));
+
+assert.bufferEqual(T.parse(
+  T.serialize({
+   optionalBytes: 'foo'
+  })
+).optionalBytes, new Buffer('foo'));
+
+assert.bufferEqual(T.parse(
+  T.serialize({
+   optionalBytes: '\u20ac'
+  })
+).optionalBytes, new Buffer('\u00e2\u0082\u00ac', 'binary'));
 
 puts('Success');
