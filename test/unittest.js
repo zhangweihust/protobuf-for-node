@@ -16,7 +16,7 @@ var T = new Schema(read('test/unittest.desc'))['protobuf_unittest.TestAllTypes']
 assert.ok(T, 'type in schema');
 var golden = read('test/golden_message');
 var message = T.parse(golden);
-assert.ok(message, 'parses message');  // currently rather crashes 
+assert.ok(message, 'parses message');  // currently rather crashes
 
 assert.bufferEqual(T.serialize(message), golden, 'roundtrip');
 
@@ -92,5 +92,17 @@ assert.bufferEqual(T.parse(
    optionalBytes: '\u20ac'
   })
 ).optionalBytes, new Buffer('\u00e2\u0082\u00ac', 'binary'));
+
+assert.bufferEqual(T.parse(
+  T.serialize({
+   optionalBytes: '\u0000'
+  })
+).optionalBytes, new Buffer('\u0000', 'binary'));
+
+assert.equal(T.parse(
+  T.serialize({
+   optionalString: new Buffer('f\u0000o')
+  })
+).optionalString, 'f\u0000o');
 
 puts('Success');
