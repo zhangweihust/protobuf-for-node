@@ -265,7 +265,7 @@ namespace protobuf_for_node {
         Local<Object> buffer_obj = args[0]->ToObject();
 
         Message* message = type->NewMessage();
-        bool success = 
+        bool success =
           message->ParseFromArray(Buffer::Data(buffer_obj), Buffer::Length(buffer_obj));
         Handle<Value> result = success
           ? Handle<Value>(type->ToJs(*message))
@@ -299,12 +299,13 @@ namespace protobuf_for_node {
                         value.As<Object>());
           break;
         case FieldDescriptor::CPPTYPE_STRING: {
-          if (field->type() == FieldDescriptor::TYPE_BYTES &&
-              Buffer::HasInstance(value)) {
+          // Shortcutting Utf8value(buffer.toString())
+          if (Buffer::HasInstance(value)) {
             Local<Object> buf = value->ToObject();
             SET(String, string(Buffer::Data(buf), Buffer::Length(buf)));
           } else {
-            SET(String, *String::Utf8Value(value));
+            String::Utf8Value utf8(value);
+            SET(String, string(*utf8, utf8.length()));
           }
           break;
         }
