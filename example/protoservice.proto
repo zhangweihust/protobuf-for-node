@@ -12,6 +12,8 @@
 // implied. See the License for the specific language governing
 // permissions and limitations under the License.
 
+option cc_generic_services = true;
+
 // An example service to query pwd(3).
 package pwd;
 
