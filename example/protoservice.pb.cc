@@ -2,6 +2,9 @@
 
 #define INTERNAL_SUPPRESS_PROTOBUF_FIELD_DEPRECATION
 #include "protoservice.pb.h"
+
+#include <algorithm>
+
 #include <google/protobuf/stubs/once.h>
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/wire_format_lite_inl.h>
@@ -126,7 +129,7 @@ void protobuf_AddDesc_protoservice_2eproto() {
     "\013\n\003gid\030\003 \001(\005\022\014\n\004home\030\004 \001(\t\022\r\n\005shell\030\005 \001("
     "\t\",\n\017EntriesResponse\022\031\n\005entry\030\001 \003(\0132\n.pw"
     "d.Entry2>\n\003Pwd\0227\n\nGetEntries\022\023.pwd.Entri"
-    "esRequest\032\024.pwd.EntriesResponse", 231);
+    "esRequest\032\024.pwd.EntriesResponseB\003\200\001\001", 236);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "protoservice.proto", &protobuf_RegisterTypes);
   EntriesRequest::default_instance_ = new EntriesRequest();
@@ -303,9 +306,6 @@ void EntriesRequest::Swap(EntriesRequest* other) {
 
 // ===================================================================
 
-const ::std::string Entry::_default_name_;
-const ::std::string Entry::_default_home_;
-const ::std::string Entry::_default_shell_;
 #ifndef _MSC_VER
 const int Entry::kNameFieldNumber;
 const int Entry::kUidFieldNumber;
@@ -330,11 +330,11 @@ Entry::Entry(const Entry& from)
 
 void Entry::SharedCtor() {
   _cached_size_ = 0;
-  name_ = const_cast< ::std::string*>(&_default_name_);
+  name_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   uid_ = 0;
   gid_ = 0;
-  home_ = const_cast< ::std::string*>(&_default_home_);
-  shell_ = const_cast< ::std::string*>(&_default_shell_);
+  home_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  shell_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -343,13 +343,13 @@ Entry::~Entry() {
 }
 
 void Entry::SharedDtor() {
-  if (name_ != &_default_name_) {
+  if (name_ != &::google::protobuf::internal::kEmptyString) {
     delete name_;
   }
-  if (home_ != &_default_home_) {
+  if (home_ != &::google::protobuf::internal::kEmptyString) {
     delete home_;
   }
-  if (shell_ != &_default_shell_) {
+  if (shell_ != &::google::protobuf::internal::kEmptyString) {
     delete shell_;
   }
   if (this != default_instance_) {
@@ -378,20 +378,20 @@ Entry* Entry::New() const {
 
 void Entry::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (_has_bit(0)) {
-      if (name_ != &_default_name_) {
+    if (has_name()) {
+      if (name_ != &::google::protobuf::internal::kEmptyString) {
         name_->clear();
       }
     }
     uid_ = 0;
     gid_ = 0;
-    if (_has_bit(3)) {
-      if (home_ != &_default_home_) {
+    if (has_home()) {
+      if (home_ != &::google::protobuf::internal::kEmptyString) {
         home_->clear();
       }
     }
-    if (_has_bit(4)) {
-      if (shell_ != &_default_shell_) {
+    if (has_shell()) {
+      if (shell_ != &::google::protobuf::internal::kEmptyString) {
         shell_->clear();
       }
     }
@@ -430,7 +430,7 @@ bool Entry::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &uid_)));
-          _set_bit(1);
+          set_has_uid();
         } else {
           goto handle_uninterpreted;
         }
@@ -446,7 +446,7 @@ bool Entry::MergePartialFromCodedStream(
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
                  input, &gid_)));
-          _set_bit(2);
+          set_has_gid();
         } else {
           goto handle_uninterpreted;
         }
@@ -507,7 +507,7 @@ bool Entry::MergePartialFromCodedStream(
 void Entry::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // optional string name = 1;
-  if (_has_bit(0)) {
+  if (has_name()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->name().data(), this->name().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -516,17 +516,17 @@ void Entry::SerializeWithCachedSizes(
   }
   
   // optional int32 uid = 2;
-  if (_has_bit(1)) {
+  if (has_uid()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(2, this->uid(), output);
   }
   
   // optional int32 gid = 3;
-  if (_has_bit(2)) {
+  if (has_gid()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->gid(), output);
   }
   
   // optional string home = 4;
-  if (_has_bit(3)) {
+  if (has_home()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->home().data(), this->home().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -535,7 +535,7 @@ void Entry::SerializeWithCachedSizes(
   }
   
   // optional string shell = 5;
-  if (_has_bit(4)) {
+  if (has_shell()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->shell().data(), this->shell().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -552,7 +552,7 @@ void Entry::SerializeWithCachedSizes(
 ::google::protobuf::uint8* Entry::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // optional string name = 1;
-  if (_has_bit(0)) {
+  if (has_name()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->name().data(), this->name().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -562,17 +562,17 @@ void Entry::SerializeWithCachedSizes(
   }
   
   // optional int32 uid = 2;
-  if (_has_bit(1)) {
+  if (has_uid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(2, this->uid(), target);
   }
   
   // optional int32 gid = 3;
-  if (_has_bit(2)) {
+  if (has_gid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->gid(), target);
   }
   
   // optional string home = 4;
-  if (_has_bit(3)) {
+  if (has_home()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->home().data(), this->home().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -582,7 +582,7 @@ void Entry::SerializeWithCachedSizes(
   }
   
   // optional string shell = 5;
-  if (_has_bit(4)) {
+  if (has_shell()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->shell().data(), this->shell().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE);
@@ -664,19 +664,19 @@ void Entry::MergeFrom(const ::google::protobuf::Message& from) {
 void Entry::MergeFrom(const Entry& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from._has_bit(0)) {
+    if (from.has_name()) {
       set_name(from.name());
     }
-    if (from._has_bit(1)) {
+    if (from.has_uid()) {
       set_uid(from.uid());
     }
-    if (from._has_bit(2)) {
+    if (from.has_gid()) {
       set_gid(from.gid());
     }
-    if (from._has_bit(3)) {
+    if (from.has_home()) {
       set_home(from.home());
     }
-    if (from._has_bit(4)) {
+    if (from.has_shell()) {
       set_shell(from.shell());
     }
   }
